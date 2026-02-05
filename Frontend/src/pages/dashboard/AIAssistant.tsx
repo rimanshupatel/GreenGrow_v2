@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, Settings } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { GEMINI_API_KEY } from "@/lib/env";
 
 // Web Speech API type definitions
 interface SpeechRecognition extends EventTarget {
@@ -612,8 +613,12 @@ In those cases, say:
 User query: ${input}`;
 
     try {
+      if (!GEMINI_API_KEY) {
+        throw new Error('Gemini API key is missing');
+      }
+
       const response = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCjGNVrWpRdhxdtEoAuLLJzSmSCXeRp80g',
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: {

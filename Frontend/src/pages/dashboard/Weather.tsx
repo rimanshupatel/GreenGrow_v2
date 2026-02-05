@@ -33,6 +33,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { OPENWEATHER_API_KEY } from "@/lib/env";
 
 // ---------------------- Interfaces ----------------------
 interface WeatherData {
@@ -266,7 +267,7 @@ const WeatherDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_KEY = "15a089805b00267c8ec096f2affffe39";
+  const API_KEY = OPENWEATHER_API_KEY;
 
   const getWeatherIcon = (weatherMain: string) => {
     switch (weatherMain.toLowerCase()) {
@@ -288,6 +289,9 @@ const WeatherDashboard = () => {
     setError(null);
 
     try {
+      if (!API_KEY) {
+        throw new Error("Weather API key is missing");
+      }
       const currentResponse = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
       );

@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { apiUrl } from "@/lib/env";
 
 // ✅ Type definitions
 interface UserData {
@@ -57,7 +58,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUserData = async (): Promise<void> => {
       try {
-        const response = await fetch("http://localhost:8000/api/auth/user", {
+        const response = await fetch(apiUrl("/api/auth/user"), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

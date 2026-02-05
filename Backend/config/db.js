@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 
 const connectDB = async () => {
-  const mongoURI =
-    "mongodb+srv://rimanshupatel3_db_user:greenn@cluster0.mulcv3a.mongodb.net/";
+  if (!process.env.MONGO_URI) {
+    console.error("❌ MONGO_URI is not set in environment variables");
+    process.exit(1);
+  }
 
   try {
     // Optional: Fetch and log the public IP of this server (e.g., for Render)

@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { OPENWEATHER_API_KEY, THINGSPEAK_API_KEY } from "@/lib/env";
 
 const Index = () => {
   // Hardware Connection State
@@ -204,7 +205,12 @@ const Index = () => {
   // Fetch real-time data from ThingSpeak API
   const fetchRealTimeData = async () => {
     setIsLoadingRealTimeData(true);
-    const apiUrl = 'https://api.thingspeak.com/channels/2992127/feeds.json?api_key=ZKLWWWNN9B5KBN4V';
+    if (!THINGSPEAK_API_KEY) {
+      setIsLoadingRealTimeData(false);
+      console.warn("ThingSpeak API key is missing");
+      return;
+    }
+    const apiUrl = `https://api.thingspeak.com/channels/2992127/feeds.json?api_key=${THINGSPEAK_API_KEY}`;
 
     try {
       const response = await fetch(apiUrl);
@@ -542,7 +548,10 @@ const Index = () => {
     setIsPredictingCrop(true);
     
     try {
-      const apiKey = '04bf89ecabf9ac4cae7a7173c5cdd1bb';
+      const apiKey = OPENWEATHER_API_KEY;
+      if (!apiKey) {
+        throw new Error("Weather API key is missing");
+      }
       const weatherData = await getWeatherForecast(manualInput.district, apiKey);
       
       setRainfall(weatherData.rainAmount);
