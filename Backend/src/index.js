@@ -14,9 +14,6 @@ const loginRoutes = require('../routes/loginroutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
-connectDB();
-
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -30,7 +27,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("❌ CORS blocked request from:", origin);
+      console.log("CORS blocked request from:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -40,34 +37,44 @@ app.use(cors({
 app.use(express.json());
 
 // Session middleware
-app.set("trust proxy", 1); // 🔥 REQUIRED if frontend & backend on diff ports
+app.set("trust proxy", 1); // Required if frontend & backend on different ports
 
-app.use(session({
-  name: "connect.sid",
-  secret: process.env.SESSION_SECRET || "fallbackSecretKey",
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    client: mongoose.connection.getClient(),
-    collectionName: "sessions",
-    ttl: 60 * 60
-  }),
-  cookie: {
-    maxAge: 1000 * 60 * 60,
-    httpOnly: true,
-    sameSite: "lax",   // 🔥 REQUIRED
-    secure: false     // true ONLY for HTTPS
-  }
-}));
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/auth', loginRoutes);
+const startServer = async () => {
+  await connectDB();
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.send('Server running 🚀');
-});
+  app.use(session({
+    name: "connect.sid",
+    secret: process.env.SESSION_SECRET || "fallbackSecretKey",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      client: mongoose.connection.getClient(),
+      collectionName: "sessions",
+      ttl: 60 * 60
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false
+    }
+  }));
 
-app.listen(PORT, () => {
-  console.log(`✅ Server is live at http://localhost:${PORT}`);
+  // API Routes
+  app.use('/api/auth', authRoutes);
+  app.use('/api/auth', loginRoutes);
+
+  // Root endpoint
+  app.get('/', (req, res) => {
+    res.send('Server running');
+  });
+
+  app.listen(PORT, () => {
+    console.log(`Server is live at http://localhost:${PORT}`);
+  });
+};
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });

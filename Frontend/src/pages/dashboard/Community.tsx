@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { APITUBE_API_KEY, OPENWEATHER_API_KEY } from "@/lib/env";
 
 // Define user type
 const users = {
@@ -154,13 +155,18 @@ export default function AgriGram() {
   const [isLoadingWeather, setIsLoadingWeather] = useState(true);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 
-  const WEATHER_API_KEY = "15a089805b00267c8ec096f2affffe39";
-  const APITUBE_API_KEY = "api_live_5n4rk59DIdshFHqteYbRv5YvEAlLGL3xMvjzjCKt5jnCaO";
+  const WEATHER_API_KEY = OPENWEATHER_API_KEY;
+  const NEWS_API_KEY = APITUBE_API_KEY;
 
   // Get user location and fetch weather data
   useEffect(() => {
     const getLocationAndWeather = async () => {
       try {
+        if (!WEATHER_API_KEY) {
+          console.warn("Weather API key is missing");
+          setIsLoadingWeather(false);
+          return;
+        }
         // Get user location
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -226,6 +232,9 @@ export default function AgriGram() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
+        if (!NEWS_API_KEY) {
+          console.warn("News API key is missing, using mock data");
+        }
         // Mock news data since the API might not be directly accessible in this environment
         const mockNews = [
           {

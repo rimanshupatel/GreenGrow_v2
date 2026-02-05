@@ -1,11 +1,11 @@
-const LoginUser = require("../models/login_user");
-const bcrypt = require("bcrypt");
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await LoginUser.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "User not found" });
     }

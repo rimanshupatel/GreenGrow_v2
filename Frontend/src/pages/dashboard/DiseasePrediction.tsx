@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, Camera, Leaf, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { GEMINI_API_KEY } from "@/lib/env";
 
 export default function DiseasePredictionPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,7 +49,7 @@ export default function DiseasePredictionPage() {
   };
 
   const fetchGeminiTreatment = async (disease: string) => {
-    const apiKey = 'AIzaSyDD8QW1BggDVVMLteDygHCHrD6Ff9Dy0e8';
+    const apiKey = GEMINI_API_KEY;
     const prompt = `Provide a concise description (1-2 sentences) of the plant disease "${disease}" and suggest exactly 3 bullet point treatments. Format the response as:
 Description: [Your description]
 Treatments:
@@ -57,6 +58,9 @@ Treatments:
 - [Treatment 3]`;
 
     try {
+      if (!apiKey) {
+        throw new Error("Gemini API key is missing");
+      }
       console.log('Sending request to Gemini API for disease:', disease);
       const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -124,7 +128,7 @@ Treatments:
       
       // Debug FormData content
       console.log('FormData content:');
-      for (let [key, value] of formData.entries()) {
+      for (const [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
       
