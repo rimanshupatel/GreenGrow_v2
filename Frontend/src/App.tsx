@@ -36,6 +36,7 @@ const App = () => (
 
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />}>
+            <Route index element={<Weather />} />
             <Route path="CropPrediction" element={<CropPrediction />} />
             <Route path="DiseasePrediction" element={<DiseasePrediction />} />
             <Route path="CropProductionPrediction" element={<CropProductionPrediction />} />

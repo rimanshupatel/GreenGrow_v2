@@ -67,20 +67,35 @@ export default function Dashboard() {
         });
 
         const data: ApiUserResponse = await response.json();
-        if (response.ok && data.user) {
-          setUser({ name: data.user.name, email: data.user.email });
+        if (response.ok) {
+          if (data.user) {
+            setUser({ name: data.user.name, email: data.user.email });
+          } else if ((data as unknown as UserData).name && (data as unknown as UserData).email) {
+            const directUser = data as unknown as UserData;
+            setUser({ name: directUser.name, email: directUser.email });
+          } else {
+            console.warn("Failed to fetch user data:", data.msg);
+          }
         } else {
           console.warn("Failed to fetch user data:", data.msg);
           const storedUser = localStorage.getItem("user");
           if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+              setUser(JSON.parse(storedUser));
+            } catch (err) {
+              console.warn("Invalid user data in localStorage:", err);
+            }
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          try {
+            setUser(JSON.parse(storedUser));
+          } catch (err) {
+            console.warn("Invalid user data in localStorage:", err);
+          }
         }
       }
     };
@@ -92,16 +107,14 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <aside
-        className={`bg-gradient-to-b from-agri-50 to-agri-100 border-r border-agri-200 transition-all duration-300 ${
-          isSidebarOpen ? "w-64" : "w-20"
-        } hidden md:block`}
+        className={`bg-gradient-to-b from-agri-50 to-agri-100 border-r border-agri-200 transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-20"
+          } hidden md:block`}
       >
         <div className="h-full flex flex-col">
           {/* Sidebar Header */}
           <div
-            className={`p-4 border-b border-gray-200 flex ${
-              isSidebarOpen ? "justify-between" : "justify-center"
-            }`}
+            className={`p-4 border-b border-gray-200 flex ${isSidebarOpen ? "justify-between" : "justify-center"
+              }`}
           >
             {isSidebarOpen ? (
               <Link to="/" className="flex items-center gap-2 mb-4">
